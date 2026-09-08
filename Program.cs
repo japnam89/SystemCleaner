@@ -351,7 +351,7 @@ namespace AISmartCleanerFree
 
             _versionBadgeText = new TextBlock
             {
-                Text = "v2.5.0",
+                Text = "v2.5.1",
                 FontSize = 12,
                 FontWeight = FontWeight.SemiBold,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -567,7 +567,7 @@ namespace AISmartCleanerFree
             };
             _checkAppUpdatesButton.Click += (s, e) =>
             {
-                _appUpdateStatusText.Text = "✨ You are running the latest version v2.5.0 created by japnam.tech!";
+                _appUpdateStatusText.Text = "✨ You are running the latest version v2.5.1 created by japnam.tech!";
             };
 
             _appUpdatesTab.Content = new StackPanel
@@ -880,6 +880,23 @@ namespace AISmartCleanerFree
                     pathsToClean.Add(Path.Combine(home, "Library", "Caches", "Microsoft", "Edge"));
                 }
             }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                // Common Chrome/Chromium cache locations on Linux
+                if (_chromeCheck.IsChecked == true)
+                {
+                    pathsToClean.Add(Path.Combine(home, ".cache", "google-chrome"));
+                    pathsToClean.Add(Path.Combine(home, ".cache", "chromium"));
+                    pathsToClean.Add(Path.Combine(home, ".config", "google-chrome", "Default", "Cache"));
+                    pathsToClean.Add(Path.Combine(home, ".config", "chromium", "Default", "Cache"));
+                }
+                // Microsoft Edge (Linux)
+                if (_edgeCheck.IsChecked == true)
+                {
+                    pathsToClean.Add(Path.Combine(home, ".cache", "microsoft-edge"));
+                    pathsToClean.Add(Path.Combine(home, ".config", "microsoft-edge", "Default", "Cache"));
+                }
+            }
 
             foreach (var dir in pathsToClean)
             {
@@ -1171,6 +1188,33 @@ namespace AISmartCleanerFree
                     if (Directory.Exists(pfx86)) dirs.AddRange(Directory.GetDirectories(pfx86));
                     foreach (var d in dirs) apps.Add(new AppItem { Name = Path.GetFileName(d), Path = d });
                 }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    // Look for .desktop entries (common install metadata) and /opt folders
+                    string desktopDir = "/usr/share/applications";
+                    if (Directory.Exists(desktopDir))
+                    {
+                        foreach (var file in Directory.GetFiles(desktopDir, "*.desktop"))
+                        {
+                            try
+                            {
+                                var name = Path.GetFileNameWithoutExtension(file);
+                                // Attempt to read a human-friendly Name from the desktop file
+                                var lines = File.ReadAllLines(file);
+                                var nameLine = lines.FirstOrDefault(l => l.StartsWith("Name=") || l.StartsWith("Name["));
+                                if (!string.IsNullOrEmpty(nameLine)) name = nameLine.Split('=')[1];
+                                apps.Add(new AppItem { Name = name, Path = file });
+                            }
+                            catch { }
+                        }
+                    }
+                    // Also include directories under /opt as candidate installed apps
+                    string optDir = "/opt";
+                    if (Directory.Exists(optDir))
+                    {
+                        foreach (var d in Directory.GetDirectories(optDir)) apps.Add(new AppItem { Name = Path.GetFileName(d), Path = d });
+                    }
+                }
             }
             catch { }
             _uninstallerListBox.ItemsSource = apps;
@@ -1182,11 +1226,26 @@ namespace AISmartCleanerFree
             {
                 try
                 {
+                    // On Windows/macOS deleting the application folder may remove the app
                     if (Directory.Exists(app.Path))
                     {
                         Directory.Delete(app.Path, true);
                         _uninstallerStatusText.Text = $"Removed application directory: {app.Name}";
                         LoadInstalledApps();
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        // If the app entry points to a .desktop file or non-directory entry, only support removal for /opt installs
+                        if (app.Path.StartsWith("/opt") && Directory.Exists(app.Path))
+                        {
+                            Directory.Delete(app.Path, true);
+                            _uninstallerStatusText.Text = $"Removed application directory: {app.Name}";
+                            LoadInstalledApps();
+                        }
+                        else
+                        {
+                            _uninstallerStatusText.Text = "Uninstall not supported for this entry on Linux. Remove via package manager or delete files manually.";
+                        }
                     }
                 }
                 catch (Exception ex) { _uninstallerStatusText.Text = $"Could not remove app: {ex.Message}"; }
