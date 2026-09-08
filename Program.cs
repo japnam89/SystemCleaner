@@ -351,7 +351,7 @@ namespace AISmartCleanerFree
 
             _versionBadgeText = new TextBlock
             {
-                Text = "v2.5.1",
+                Text = "v2.5.2",
                 FontSize = 12,
                 FontWeight = FontWeight.SemiBold,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -567,7 +567,7 @@ namespace AISmartCleanerFree
             };
             _checkAppUpdatesButton.Click += (s, e) =>
             {
-                _appUpdateStatusText.Text = "✨ You are running the latest version v2.5.1 created by japnam.tech!";
+                _appUpdateStatusText.Text = "✨ You are running the latest version v2.5.2 created by japnam.tech!";
             };
 
             _appUpdatesTab.Content = new StackPanel

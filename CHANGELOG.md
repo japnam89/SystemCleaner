@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 Unreleased
 ---------
-### v2.5.1 - Unreleased
+### v2.5.2 - Unreleased
+- (Planned) Further enhancements and fixes
+
+Released
+--------
+### v2.5.1 - 2026-09-08
 - Add Linux support improvements:
   - Browser cache cleanup paths for Chrome/Chromium and Microsoft Edge on Linux
   - Installed applications discovery via .desktop files and /opt directory scanning
