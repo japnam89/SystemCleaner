@@ -72,7 +72,7 @@ static class Localization
                 "dup_status" => "Scan your User Downloads folder for identical photos, videos, and files.",
                 "tuneup_status" => "Click below to flush DNS cache, optimize System RAM, and free up background memory.",
                 "browser_status" => "Clean cached web data, temporary internet files, and cookies for Chrome and Edge.",
-                "app_update_status" => "You are currently running Version 2.5.0 (Stable Release).",
+                "app_update_status" => "You are currently running Version 2.5.2 (Stable Release).",
                 "specs_subtext" => "Detailed CPU, System RAM memory usage, drive storage capacity, and OS build specs.",
                 "uninstall_status" => "Select an installed application to safely remove it from your device.",
                 "startup_subtext" => "Enable or disable apps to speed up system boot times.",
@@ -119,7 +119,7 @@ static class Localization
         "dup_status" => "Analysez le dossier Téléchargements pour les photos, vidéos et fichiers identiques.",
         "tuneup_status" => "Cliquez ci-dessous pour vider le cache DNS, optimiser la RAM du système et libérer la mémoire en arrière-plan.",
         "browser_status" => "Nettoyez les données mises en cache, les fichiers Internet temporaires et les cookies pour Chrome et Edge.",
-        "app_update_status" => "Vous exécutez actuellement la version 2.5.0 (Stable).",
+        "app_update_status" => "Vous exécutez actuellement la version 2.5.2 (Stable).",
         "specs_subtext" => "Utilisation détaillée du CPU, mémoire RAM système, capacité de stockage et spécifications du système d'exploitation.",
         "uninstall_status" => "Sélectionnez une application installée pour la supprimer en toute sécurité de votre appareil.",
         "startup_subtext" => "Activez ou désactivez les applications pour accélérer le démarrage du système.",
@@ -166,7 +166,7 @@ static class Localization
         "dup_status" => "अपनी यूज़र डाउनलोड्स फ़ोल्डर को समान फ़ोटो, वीडियो और फ़ाइलों के लिए स्कैन करें।",
         "tuneup_status" => "DNS कैश खाली करने, सिस्टम RAM अनुकूलित करने, और बैकग्राउंड मेमोरी मुक्त करने के लिए नीचे क्लिक करें।",
         "browser_status" => "Chrome और Edge के लिए कैश डेटा, अस्थायी इंटरनेट फ़ाइलें और कुकीज़ साफ़ करें।",
-        "app_update_status" => "आप वर्तमान में संस्करण 2.5.0 (स्टेबल रिलीज़) चला रहे हैं।",
+        "app_update_status" => "आप वर्तमान में संस्करण 2.5.2 (स्टेबल रिलीज़) चला रहे हैं।",
         "specs_subtext" => "विस्तृत CPU, सिस्टम RAM उपयोग, ड्राइव स्टोरेज क्षमता, और OS बिल्ड स्पेक्स।",
         "uninstall_status" => "किसी इंस्टॉल की गई एप्लिकेशन का चयन करें ताकि इसे आपके डिवाइस से सुरक्षित रूप से हटाया जा सके।",
         "startup_subtext" => "सिस्टम बूट समय तेज़ करने के लिए ऐप्स को सक्षम या अक्षम करें।",
@@ -213,7 +213,7 @@ static class Localization
         "dup_status" => "ਆਪਣੇ ਯੂਜ਼ਰ ਡਾਊਨਲੋਡ ਫੋਲਡਰ ਨੂੰ ਇੱਕੋ-ਜਿਹੇ ਫੋਟੋ, ਵੀਡੀਓ ਅਤੇ ਫਾਈਲਾਂ ਲਈ ਸਕੈਨ ਕਰੋ।",
         "tuneup_status" => "DNS ਕੈਸ਼ ਖਾਲੀ ਕਰਨ, ਸਿਸਟਮ RAM ਨੂੰ ਓਪਟਿਮਾਈਜ਼ ਕਰਨ ਅਤੇ ਬੈਕਗ੍ਰਾਊਂਡ ਮੈਮੋਰੀ ਨੂੰ ਖਾਲੀ ਕਰਨ ਲਈ ਹੇਠਾਂ ਕਲਿੱਕ ਕਰੋ।",
         "browser_status" => "Chrome ਅਤੇ Edge ਲਈ ਕੈਸ਼ ਡੇਟਾ, ਅਸਥਾਈ ਇੰਟਰਨੈੱਟ ਫਾਇਲਾਂ ਅਤੇ ਕੁਕੀਜ਼ ਨੂੰ ਸਾਫ਼ ਕਰੋ।",
-        "app_update_status" => "ਤੁਸੀਂ ਇਸ ਵੇਲੇ ਵਰਜ਼ਨ 2.5.0 (ਸਟੇਬਲ ਰੀਲੀਜ਼) ਚਲਾ ਰਹੇ ਹੋ।",
+        "app_update_status" => "ਤੁਸੀਂ ਇਸ ਵੇਲੇ ਵਰਜ਼ਨ 2.5.2 (ਸਟੇਬਲ ਰੀਲੀਜ਼) ਚਲਾ ਰਹੇ ਹੋ।",
         "specs_subtext" => "ਵਿਸਤਾਰਤ CPU, ਸਿਸਟਮ RAM ਵਰਤੋਂ, ਡ੍ਰਾਈਵ ਸਟੋਰੇਜ ਸਮਰੱਥਾ ਅਤੇ OS ਬਿਲਡ ਸਪੈਕਸ।",
         "uninstall_status" => "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਇੰਸਟਾਲ ਕੀਤੀ ਐਪਲੀਕੇਸ਼ਨ ਚੁਣੋ ਤਾਂ ਕਿ ਇਸਨੂੰ ਤੁਹਾਡੇ ਡਿਵਾਈਸ ਤੋਂ ਸੁਰੱਖਿਅਤ ਤੌਰ 'ਤੇ ਹਟਾਇਆ ਜਾ ਸਕੇ।",
         "startup_subtext" => "ਸਿਸਟਮ ਬੂਟ ਸਮਾਂ ਤੇਜ਼ ਕਰਨ ਲਈ ਐਪਸ ਨੂੰ ਸਖਤ ਜਾਂ ਅਯੋਗ ਕਰੋ।",
@@ -843,13 +843,17 @@ namespace AISmartCleanerFree
             _cleanBrowsersButton.IsEnabled = false;
             _browserStatusText.Text = "Cleaning web browser caches and temporary files...";
 
-            int cleanedFiles = await Task.Run(() => PerformBrowserCleanup());
+            // Capture UI state on the UI thread to avoid cross-thread access
+            bool chromeChecked = _chromeCheck.IsChecked == true;
+            bool edgeChecked = _edgeCheck.IsChecked == true;
+
+            int cleanedFiles = await PerformBrowserCleanupAsync(chromeChecked, edgeChecked);
 
             _browserStatusText.Text = $"✨ Browser Cleanup Complete! Removed {cleanedFiles} temporary cache files.";
             _cleanBrowsersButton.IsEnabled = true;
         }
 
-        private int PerformBrowserCleanup()
+        private async Task<int> PerformBrowserCleanupAsync(bool chromeChecked, bool edgeChecked)
         {
             int count = 0;
             var pathsToClean = new List<string>();
@@ -858,12 +862,12 @@ namespace AISmartCleanerFree
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                if (_chromeCheck.IsChecked == true)
+                if (chromeChecked)
                 {
                     pathsToClean.Add(Path.Combine(localAppData, "Google", "Chrome", "User Data", "Default", "Cache"));
                     pathsToClean.Add(Path.Combine(localAppData, "Google", "Chrome", "User Data", "Default", "Code Cache"));
                 }
-                if (_edgeCheck.IsChecked == true)
+                if (edgeChecked)
                 {
                     pathsToClean.Add(Path.Combine(localAppData, "Microsoft", "Edge", "User Data", "Default", "Cache"));
                     pathsToClean.Add(Path.Combine(localAppData, "Microsoft", "Edge", "User Data", "Default", "Code Cache"));
@@ -871,11 +875,11 @@ namespace AISmartCleanerFree
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                if (_chromeCheck.IsChecked == true)
+                if (chromeChecked)
                 {
                     pathsToClean.Add(Path.Combine(home, "Library", "Caches", "Google", "Chrome"));
                 }
-                if (_edgeCheck.IsChecked == true)
+                if (edgeChecked)
                 {
                     pathsToClean.Add(Path.Combine(home, "Library", "Caches", "Microsoft", "Edge"));
                 }
@@ -883,7 +887,7 @@ namespace AISmartCleanerFree
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // Common Chrome/Chromium cache locations on Linux
-                if (_chromeCheck.IsChecked == true)
+                if (chromeChecked)
                 {
                     pathsToClean.Add(Path.Combine(home, ".cache", "google-chrome"));
                     pathsToClean.Add(Path.Combine(home, ".cache", "chromium"));
@@ -891,12 +895,16 @@ namespace AISmartCleanerFree
                     pathsToClean.Add(Path.Combine(home, ".config", "chromium", "Default", "Cache"));
                 }
                 // Microsoft Edge (Linux)
-                if (_edgeCheck.IsChecked == true)
+                if (edgeChecked)
                 {
                     pathsToClean.Add(Path.Combine(home, ".cache", "microsoft-edge"));
                     pathsToClean.Add(Path.Combine(home, ".config", "microsoft-edge", "Default", "Cache"));
                 }
             }
+
+            // Use a semaphore to limit concurrency when deleting many files
+            var deleteTasks = new List<Task>();
+            var sem = new System.Threading.SemaphoreSlim(Environment.ProcessorCount);
 
             foreach (var dir in pathsToClean)
             {
@@ -906,17 +914,34 @@ namespace AISmartCleanerFree
                     {
                         foreach (var file in Directory.EnumerateFiles(dir, "*.*", SearchOption.AllDirectories))
                         {
-                            try
+                            await sem.WaitAsync();
+                            var f = file; // capture
+                            var t = Task.Run(() =>
                             {
-                                File.Delete(file);
-                                count++;
-                            }
-                            catch { /* Locked file in use by browser */ }
+                                try
+                                {
+                                    File.Delete(f);
+                                    System.Threading.Interlocked.Increment(ref count);
+                                }
+                                catch { /* Locked or inaccessible file */ }
+                                finally
+                                {
+                                    sem.Release();
+                                }
+                            });
+
+                            deleteTasks.Add(t);
                         }
                     }
                     catch { }
                 }
             }
+
+            try
+            {
+                await Task.WhenAll(deleteTasks);
+            }
+            catch { }
 
             return count;
         }

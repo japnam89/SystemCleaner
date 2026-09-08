@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 Unreleased
 ---------
 ### v2.5.2 - Unreleased
-- (Planned) Further enhancements and fixes
+- Fix: Browser cleanup crash when run from background thread. The cleanup now captures UI state on the UI thread and performs asynchronous, limited-concurrency file deletions to avoid cross-thread access and improve robustness.
 
 Released
 --------
