@@ -298,6 +298,10 @@ namespace AISmartCleanerFree
         private Button _cleanBrowsersButton;
         private CheckBox _chromeCheck;
         private CheckBox _edgeCheck;
+        private CheckBox _tempFilesCheck;
+        private CheckBox _dumpsCheck;
+        private CheckBox _recycleBinCheck;
+        private CheckBox _downloadsCheck;
 
         // --- UNINSTALLER FIELDS ---
         private ListBox _uninstallerListBox;
@@ -526,7 +530,11 @@ namespace AISmartCleanerFree
             _browserStatusText.Margin = new Thickness(0, 0, 0, 20);
 
             _chromeCheck = new CheckBox { Content = "🌐 Clean Google Chrome Cache & Cookies", IsChecked = true, Margin = new Thickness(0, 0, 0, 10), FontSize = 14 };
-            _edgeCheck = new CheckBox { Content = "🌐 Clean Microsoft Edge Cache & Cookies", IsChecked = true, Margin = new Thickness(0, 0, 0, 20), FontSize = 14 };
+            _edgeCheck = new CheckBox { Content = "🌐 Clean Microsoft Edge Cache & Cookies", IsChecked = true, Margin = new Thickness(0, 0, 0, 10), FontSize = 14 };
+            _tempFilesCheck = new CheckBox { Content = "🧹 Clear Temp Files (TEMP / /tmp)", IsChecked = true, Margin = new Thickness(0, 0, 0, 10), FontSize = 14 };
+            _dumpsCheck = new CheckBox { Content = "💥 Remove System Crash Dumps (.dmp)", IsChecked = true, Margin = new Thickness(0, 0, 0, 10), FontSize = 14 };
+            _recycleBinCheck = new CheckBox { Content = "🗑️ Empty Recycle Bin / Trash", IsChecked = false, Margin = new Thickness(0, 0, 0, 10), FontSize = 14 };
+            _downloadsCheck = new CheckBox { Content = "📥 Clear Downloads (optional)", IsChecked = false, Margin = new Thickness(0, 0, 0, 20), FontSize = 14 };
 
             _cleanBrowsersButton = new Button
             {
@@ -546,7 +554,7 @@ namespace AISmartCleanerFree
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(40),
-                Children = { browserHeader, _browserStatusText, _chromeCheck, _edgeCheck, _cleanBrowsersButton }
+                Children = { browserHeader, _browserStatusText, _chromeCheck, _edgeCheck, _tempFilesCheck, _dumpsCheck, _recycleBinCheck, _downloadsCheck, _cleanBrowsersButton }
             };
             _browserTab.Content = browserStack;
 
@@ -846,14 +854,22 @@ namespace AISmartCleanerFree
             // Capture UI state on the UI thread to avoid cross-thread access
             bool chromeChecked = _chromeCheck.IsChecked == true;
             bool edgeChecked = _edgeCheck.IsChecked == true;
+            bool tempChecked = _tempFilesCheck.IsChecked == true;
+            bool dumpsChecked = _dumpsCheck.IsChecked == true;
+            bool recycleChecked = _recycleBinCheck.IsChecked == true;
+            bool downloadsChecked = _downloadsCheck.IsChecked == true;
 
-            int cleanedFiles = await PerformBrowserCleanupAsync(chromeChecked, edgeChecked);
+            int cleanedFiles = await PerformBrowserCleanupAsync(chromeChecked, edgeChecked, tempChecked, dumpsChecked, recycleChecked, downloadsChecked);
 
             _browserStatusText.Text = $"✨ Browser Cleanup Complete! Removed {cleanedFiles} temporary cache files.";
             _cleanBrowsersButton.IsEnabled = true;
         }
 
-        private async Task<int> PerformBrowserCleanupAsync(bool chromeChecked, bool edgeChecked)
+        // P/Invoke to empty the Windows Recycle Bin
+        [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern int SHEmptyRecycleBin(IntPtr hwnd, string pszRootPath, uint dwFlags);
+
+        private async Task<int> PerformBrowserCleanupAsync(bool chromeChecked, bool edgeChecked, bool tempChecked, bool dumpsChecked, bool recycleChecked, bool downloadsChecked)
         {
             int count = 0;
             var pathsToClean = new List<string>();
@@ -902,6 +918,87 @@ namespace AISmartCleanerFree
                 }
             }
 
+            // TEMP files
+            try
+            {
+                if (tempChecked)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        pathsToClean.Add(Path.GetTempPath());
+                        pathsToClean.Add(Path.Combine(home, "AppData", "Local", "Temp"));
+                    }
+                    else
+                    {
+                        pathsToClean.Add(Path.Combine("/tmp"));
+                    }
+                }
+            }
+            catch { }
+
+            // Downloads
+            try
+            {
+                if (downloadsChecked)
+                {
+                    pathsToClean.Add(Path.Combine(home, "Downloads"));
+                }
+            }
+            catch { }
+
+            // Crash dumps / memory dump files
+            var dumpFiles = new List<string>();
+            try
+            {
+                if (dumpsChecked)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                        var windir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                        dumpFiles.Add(Path.Combine(windir, "MEMORY.DMP"));
+                        dumpFiles.Add(Path.Combine(windir, "Minidump"));
+                        dumpFiles.Add(Path.Combine(localAppData, "CrashDumps"));
+                    }
+                    else
+                    {
+                        // common crash dirs on Unix
+                        dumpFiles.Add(Path.Combine("/var", "crash"));
+                    }
+                }
+            }
+            catch { }
+
+            // Recycle Bin / Trash
+            bool emptiedRecycle = false;
+            try
+            {
+                if (recycleChecked)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        try
+                        {
+                            const uint SHERB_NOCONFIRMATION = 0x00000001;
+                            const uint SHERB_NOPROGRESSUI = 0x00000002;
+                            const uint SHERB_NOSOUND = 0x00000004;
+                            SHEmptyRecycleBin(IntPtr.Zero, null, SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
+                            emptiedRecycle = true;
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        // Try common trash locations on Unix-like systems
+                        var trash1 = Path.Combine(home, ".local", "share", "Trash", "files");
+                        var trash2 = Path.Combine(home, ".Trash");
+                        pathsToClean.Add(trash1);
+                        pathsToClean.Add(trash2);
+                    }
+                }
+            }
+            catch { }
+
             // Use a semaphore to limit concurrency when deleting many files
             var deleteTasks = new List<Task>();
             var sem = new System.Threading.SemaphoreSlim(Environment.ProcessorCount);
@@ -935,6 +1032,37 @@ namespace AISmartCleanerFree
                     }
                     catch { }
                 }
+            }
+
+            // Delete explicit dump files / directories
+            foreach (var df in dumpFiles)
+            {
+                try
+                {
+                    if (File.Exists(df))
+                    {
+                        try { File.Delete(df); System.Threading.Interlocked.Increment(ref count); } catch { }
+                    }
+                    else if (Directory.Exists(df))
+                    {
+                        try
+                        {
+                            foreach (var file in Directory.EnumerateFiles(df, "*.*", SearchOption.AllDirectories))
+                            {
+                                await sem.WaitAsync();
+                                var f = file;
+                                var t = Task.Run(() =>
+                                {
+                                    try { File.Delete(f); System.Threading.Interlocked.Increment(ref count); } catch { }
+                                    finally { sem.Release(); }
+                                });
+                                deleteTasks.Add(t);
+                            }
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
             }
 
             try
