@@ -4,7 +4,21 @@ All notable changes to this project will be documented in this file.
 
 Unreleased
 ---------
-### v2.5.2 - Unreleased
+### v2.5.3 - Unreleased
+- Feature: AI Smart Clean enhancements — allow selecting specific folders and drives to scan and clean. Users can now add custom folders or pick drives to include in scans.
+- Feature: Include additional cleanup targets (optional checkboxes):
+  - Clear Temp files (system and user temp folders)
+  - Remove system crash dumps and minidumps
+  - Empty Recycle Bin / Trash
+  - Clear Downloads folder (optional)
+  - Include system drivers folders (advanced; use with caution)
+- Feature: Browser Cleaner improvements — fixed cross-thread crash and made cleanup asynchronous with limited concurrency and robust error handling for locked files.
+- Dev: Add cross-platform publish scripts and a GitHub Actions workflow to produce self-contained artifacts for Windows, macOS, and Linux.
+- Fix: UI/Build fixes (moved helper dialog class, updated version badge)
+
+Released
+--------
+### v2.5.2 - 2026-09-09
 - Fix: Browser cleanup crash when run from background thread. The cleanup now captures UI state on the UI thread and performs asynchronous, limited-concurrency file deletions to avoid cross-thread access and improve robustness.
 - Enhancement: Add options and improved handling for additional cleanup targets:
   - Empty the Recycle Bin / Trash when selected.

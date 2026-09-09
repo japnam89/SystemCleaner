@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -75,7 +78,7 @@ static class Localization
                 "dup_status" => "Scan your User Downloads folder for identical photos, videos, and files.",
                 "tuneup_status" => "Click below to flush DNS cache, optimize System RAM, and free up background memory.",
                 "browser_status" => "Clean cached web data, temporary internet files, and cookies for Chrome and Edge.",
-                "app_update_status" => "You are currently running Version 2.5.2 (Stable Release).",
+                "app_update_status" => "You are currently running Version 2.5.3 (Stable Release).",
                 "specs_subtext" => "Detailed CPU, System RAM memory usage, drive storage capacity, and OS build specs.",
                 "uninstall_status" => "Select an installed application to safely remove it from your device.",
                 "startup_subtext" => "Enable or disable apps to speed up system boot times.",
@@ -122,7 +125,7 @@ static class Localization
         "dup_status" => "Analysez le dossier Téléchargements pour les photos, vidéos et fichiers identiques.",
         "tuneup_status" => "Cliquez ci-dessous pour vider le cache DNS, optimiser la RAM du système et libérer la mémoire en arrière-plan.",
         "browser_status" => "Nettoyez les données mises en cache, les fichiers Internet temporaires et les cookies pour Chrome et Edge.",
-        "app_update_status" => "Vous exécutez actuellement la version 2.5.2 (Stable).",
+        "app_update_status" => "Vous exécutez actuellement la version 2.5.3 (Stable).",
         "specs_subtext" => "Utilisation détaillée du CPU, mémoire RAM système, capacité de stockage et spécifications du système d'exploitation.",
         "uninstall_status" => "Sélectionnez une application installée pour la supprimer en toute sécurité de votre appareil.",
         "startup_subtext" => "Activez ou désactivez les applications pour accélérer le démarrage du système.",
@@ -169,7 +172,7 @@ static class Localization
         "dup_status" => "अपनी यूज़र डाउनलोड्स फ़ोल्डर को समान फ़ोटो, वीडियो और फ़ाइलों के लिए स्कैन करें।",
         "tuneup_status" => "DNS कैश खाली करने, सिस्टम RAM अनुकूलित करने, और बैकग्राउंड मेमोरी मुक्त करने के लिए नीचे क्लिक करें।",
         "browser_status" => "Chrome और Edge के लिए कैश डेटा, अस्थायी इंटरनेट फ़ाइलें और कुकीज़ साफ़ करें।",
-        "app_update_status" => "आप वर्तमान में संस्करण 2.5.2 (स्टेबल रिलीज़) चला रहे हैं।",
+        "app_update_status" => "आप वर्तमान में संस्करण 2.5.3 (स्टेबल रिलीज़) चला रहे हैं।",
         "specs_subtext" => "विस्तृत CPU, सिस्टम RAM उपयोग, ड्राइव स्टोरेज क्षमता, और OS बिल्ड स्पेक्स।",
         "uninstall_status" => "किसी इंस्टॉल की गई एप्लिकेशन का चयन करें ताकि इसे आपके डिवाइस से सुरक्षित रूप से हटाया जा सके।",
         "startup_subtext" => "सिस्टम बूट समय तेज़ करने के लिए ऐप्स को सक्षम या अक्षम करें।",
@@ -216,7 +219,7 @@ static class Localization
         "dup_status" => "ਆਪਣੇ ਯੂਜ਼ਰ ਡਾਊਨਲੋਡ ਫੋਲਡਰ ਨੂੰ ਇੱਕੋ-ਜਿਹੇ ਫੋਟੋ, ਵੀਡੀਓ ਅਤੇ ਫਾਈਲਾਂ ਲਈ ਸਕੈਨ ਕਰੋ।",
         "tuneup_status" => "DNS ਕੈਸ਼ ਖਾਲੀ ਕਰਨ, ਸਿਸਟਮ RAM ਨੂੰ ਓਪਟਿਮਾਈਜ਼ ਕਰਨ ਅਤੇ ਬੈਕਗ੍ਰਾਊਂਡ ਮੈਮੋਰੀ ਨੂੰ ਖਾਲੀ ਕਰਨ ਲਈ ਹੇਠਾਂ ਕਲਿੱਕ ਕਰੋ।",
         "browser_status" => "Chrome ਅਤੇ Edge ਲਈ ਕੈਸ਼ ਡੇਟਾ, ਅਸਥਾਈ ਇੰਟਰਨੈੱਟ ਫਾਇਲਾਂ ਅਤੇ ਕੁਕੀਜ਼ ਨੂੰ ਸਾਫ਼ ਕਰੋ।",
-        "app_update_status" => "ਤੁਸੀਂ ਇਸ ਵੇਲੇ ਵਰਜ਼ਨ 2.5.2 (ਸਟੇਬਲ ਰੀਲੀਜ਼) ਚਲਾ ਰਹੇ ਹੋ।",
+        "app_update_status" => "ਤੁਸੀਂ ਇਸ ਵੇਲੇ ਵਰਜ਼ਨ 2.5.3 (ਸਟੇਬਲ ਰੀਲੀਜ਼) ਚਲਾ ਰਹੇ ਹੋ।",
         "specs_subtext" => "ਵਿਸਤਾਰਤ CPU, ਸਿਸਟਮ RAM ਵਰਤੋਂ, ਡ੍ਰਾਈਵ ਸਟੋਰੇਜ ਸਮਰੱਥਾ ਅਤੇ OS ਬਿਲਡ ਸਪੈਕਸ।",
         "uninstall_status" => "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਇੰਸਟਾਲ ਕੀਤੀ ਐਪਲੀਕੇਸ਼ਨ ਚੁਣੋ ਤਾਂ ਕਿ ਇਸਨੂੰ ਤੁਹਾਡੇ ਡਿਵਾਈਸ ਤੋਂ ਸੁਰੱਖਿਅਤ ਤੌਰ 'ਤੇ ਹਟਾਇਆ ਜਾ ਸਕੇ।",
         "startup_subtext" => "ਸਿਸਟਮ ਬੂਟ ਸਮਾਂ ਤੇਜ਼ ਕਰਨ ਲਈ ਐਪਸ ਨੂੰ ਸਖਤ ਜਾਂ ਅਯੋਗ ਕਰੋ।",
@@ -239,8 +242,7 @@ namespace AISmartCleanerFree
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
-                .UsePlatformDetect()
-                .LogToTrace();
+                .UsePlatformDetect();
     }
 
 
@@ -286,16 +288,16 @@ namespace AISmartCleanerFree
         private Image _aiCleanerImageControl;
         private Border _aiImageBorder;
         private ListBox _scanTargetsListBox;
-        private Button _addFolderButton;
-        private Button _refreshDrivesButton;
-        private CheckBox _includeDriversCheck;
-        private CheckBox _includeDumpsCheck;
 
         // --- DUPLICATE FINDER FIELDS ---
         private ListBox _duplicateListBox;
         private Button _scanDuplicatesButton;
         private Button _deleteSelectedDupButton;
         private TextBlock _duplicateStatusText;
+        private ProgressBar _duplicateProgressBar;
+        private Button _cancelDuplicateButton;
+        private CancellationTokenSource _duplicateCts;
+        private ObservableCollection<DuplicateItem> _duplicateResults;
 
         // --- TUNEUP TAB FIELDS ---
         private TextBlock _tuneupStatusText;
@@ -363,7 +365,7 @@ namespace AISmartCleanerFree
 
             _versionBadgeText = new TextBlock
             {
-                Text = "v2.5.2",
+                Text = "v2.5.3",
                 FontSize = 12,
                 FontWeight = FontWeight.SemiBold,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -428,8 +430,6 @@ namespace AISmartCleanerFree
                 Child = topBarGrid
             };
 
-            // Populate initial scan targets
-            PopulateScanTargets();
 
             // --- TAB 1: AI SYSTEM CLEANER ---
             _cleanerTab = new TabItem { Header = "🤖 AI Cleaner", FontSize = 15 };
@@ -474,44 +474,16 @@ namespace AISmartCleanerFree
             };
             _cleanButton.Click += OnCleanClicked;
 
-            // Scan targets UI: list drives and allow adding custom folders
+            // Scan targets UI: list drives
             _scanTargetsListBox = new ListBox { Height = 120, SelectionMode = SelectionMode.Multiple };
-            _refreshDrivesButton = new Button { Content = "🔄 Refresh Drives", Padding = new Thickness(8,4), CornerRadius = new CornerRadius(6), Margin = new Thickness(0,6,6,0) };
-            _addFolderButton = new Button { Content = "➕ Add Folder...", Padding = new Thickness(8,4), CornerRadius = new CornerRadius(6), Margin = new Thickness(6,6,0,0) };
-            _includeDriversCheck = new CheckBox { Content = "🔧 Include Drivers Folders (e.g., system drivers)", IsChecked = false, Margin = new Thickness(0,8,0,0) };
-            _includeDumpsCheck = new CheckBox { Content = "💥 Include System Crash Dumps", IsChecked = false, Margin = new Thickness(0,4,0,10) };
-
-            var targetButtons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center };
-            targetButtons.Children.Add(_refreshDrivesButton);
-            targetButtons.Children.Add(_addFolderButton);
-
-            // Hook up drive refresh and folder picker
-            _refreshDrivesButton.Click += (s, e) => PopulateScanTargets();
-            _addFolderButton.Click += async (s, e) =>
-            {
-                try
-                {
-                    // Simple text prompt for folder path (cross-platform)
-                    var dlg = new SimpleInputDialog("Enter folder path to add:");
-                    var folder = await dlg.ShowDialog<string?>(this);
-                    if (!string.IsNullOrWhiteSpace(folder))
-                    {
-                        var current = (_scanTargetsListBox.ItemsSource as List<string>) ?? (_scanTargetsListBox.Items?.Cast<object>().Select(o => o?.ToString()).Where(s => !string.IsNullOrWhiteSpace(s)).ToList() ?? new List<string>());
-                        if (!current.Contains(folder))
-                        {
-                            current.Add(folder);
-                            _scanTargetsListBox.ItemsSource = current.Distinct().ToList();
-                        }
-                    }
-                }
-                catch { }
-            };
+            // Now that the ListBox control is created, populate it with default scan targets
+            PopulateScanTargets();
 
             _cleanerTab.Content = new StackPanel
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(40),
-                Children = { cleanerHeader, _statusText, _progressBar, _aiImageBorder, _scanTargetsListBox, targetButtons, _includeDriversCheck, _includeDumpsCheck, _cleanButton }
+                Children = { cleanerHeader, _statusText, _progressBar, _aiImageBorder, _scanTargetsListBox, _cleanButton }
             };
 
             // --- TAB 2: DUPLICATE FINDER ---
@@ -521,22 +493,28 @@ namespace AISmartCleanerFree
             _duplicateStatusText.Margin = new Thickness(0, 0, 0, 12);
 
             _duplicateListBox = CreateStyledListBox();
+            _duplicateResults = new ObservableCollection<DuplicateItem>();
+            _duplicateListBox.ItemsSource = _duplicateResults;
             _scanDuplicatesButton = new Button { Content = "🔎 Scan Duplicates", Padding = new Thickness(16, 8), CornerRadius = new CornerRadius(6) };
             _scanDuplicatesButton.Click += OnScanDuplicatesClicked;
 
             _deleteSelectedDupButton = new Button { Content = "🗑️ Delete Selected Duplicate", Padding = new Thickness(16, 8), CornerRadius = new CornerRadius(6), Margin = new Thickness(10, 0, 0, 0) };
             _deleteSelectedDupButton.Click += OnDeleteDuplicateClicked;
 
+            _duplicateProgressBar = new ProgressBar { Height = 6, Minimum = 0, Maximum = 100, IsVisible = false, Margin = new Thickness(0,6,0,6) };
+            _cancelDuplicateButton = new Button { Content = "Cancel", Padding = new Thickness(8,4), CornerRadius = new CornerRadius(6), IsVisible = false, Margin = new Thickness(6,0,0,0) };
+            _cancelDuplicateButton.Click += (s, e) => { try { _duplicateCts?.Cancel(); } catch { } };
+
             var dupButtonPanel = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Children = { _scanDuplicatesButton, _deleteSelectedDupButton }
+                Children = { _scanDuplicatesButton, _deleteSelectedDupButton, _cancelDuplicateButton }
             };
             _duplicateTab.Content = new StackPanel
             {
                 Margin = new Thickness(30, 20, 30, 20),
-                Children = { dupHeader, _duplicateStatusText, _duplicateListBox, dupButtonPanel }
+                Children = { dupHeader, _duplicateStatusText, _duplicateProgressBar, _duplicateListBox, dupButtonPanel }
             };
 
             // --- TAB 3: PERFORMANCE TUNEUP ---
@@ -619,7 +597,7 @@ namespace AISmartCleanerFree
             };
             _checkAppUpdatesButton.Click += (s, e) =>
             {
-                _appUpdateStatusText.Text = "✨ You are running the latest version v2.5.2 created by japnam.tech!";
+                _appUpdateStatusText.Text = "✨ You are running the latest version v2.5.3 created by japnam.tech!";
             };
 
             _appUpdatesTab.Content = new StackPanel
@@ -1161,12 +1139,7 @@ namespace AISmartCleanerFree
             try
             {
                 var items = new List<string>();
-                // logical drives
-                try
-                {
-                    foreach (var d in Environment.GetLogicalDrives()) items.Add(d);
-                }
-                catch { }
+                // (Removed listing of logical drives per request)
 
                 // common user folders
                 try
@@ -1243,10 +1216,8 @@ namespace AISmartCleanerFree
 
             // Capture user-selected scan targets and options on UI thread
             var selectedTargets = (_scanTargetsListBox.SelectedItems as System.Collections.IEnumerable)?.Cast<object>().Select(o => o?.ToString() ?? string.Empty).Where(s => !string.IsNullOrWhiteSpace(s)).ToList() ?? new List<string>();
-            bool includeDrivers = _includeDriversCheck.IsChecked == true;
-            bool includeDumps = _includeDumpsCheck.IsChecked == true;
 
-            var cleanupTask = Task.Run(() => PerformCleanup(selectedTargets, includeDrivers, includeDumps));
+            var cleanupTask = Task.Run(() => PerformCleanup(selectedTargets));
             var result = await cleanupTask;
 
             _statusText.Text = $"✨ AI Cleaning Complete!\n\nSpace Freed: {FormatBytes(result.FreedBytes)}\nFiles Removed: {result.DeletedCount}\nLocked Files Skipped: {result.ErrorCount}";
@@ -1340,59 +1311,152 @@ namespace AISmartCleanerFree
         private async void OnScanDuplicatesClicked(object? sender, RoutedEventArgs e)
         {
             _scanDuplicatesButton.IsEnabled = false;
+            _cancelDuplicateButton.IsVisible = true;
+            _duplicateProgressBar.Value = 0;
+            _duplicateProgressBar.IsVisible = true;
             _duplicateStatusText.Text = "Scanning Downloads folder for duplicates using SHA256 checksums...";
-            string targetDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            var duplicates = await Task.Run(() => FindDuplicates(targetDir));
-            _duplicateListBox.ItemsSource = duplicates;
-            _duplicateStatusText.Text = duplicates.Count > 0 ? $"Found {duplicates.Count} duplicate file(s)." : "No duplicate files found in Downloads folder.";
-            _scanDuplicatesButton.IsEnabled = true;
-        }
+            var downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            var roots = new List<string> { downloadsPath };
 
-        private List<DuplicateItem> FindDuplicates(string searchDir)
-        {
-            var resultList = new List<DuplicateItem>();
-            if (!Directory.Exists(searchDir)) return resultList;
+            _duplicateCts = new CancellationTokenSource();
+            var progress = new Progress<int>(v => { try { _duplicateProgressBar.Value = v; } catch { } });
+
+            // clear previous results and start fresh
+            _duplicateResults.Clear();
+            _duplicateProgressBar.IsIndeterminate = true;
+
+            List<DuplicateItem> duplicates = new List<DuplicateItem>();
             try
             {
-                var files = Directory.GetFiles(searchDir, "*.*", SearchOption.TopDirectoryOnly)
-                    .Select(f => new FileInfo(f))
-                    .Where(f => f.Length > 0)
-                    .GroupBy(f => f.Length)
-                    .Where(g => g.Count() > 1);
+                duplicates = await Task.Run(() => FindDuplicates(roots, _duplicateCts.Token, progress));
+            }
+            catch (OperationCanceledException)
+            {
+                _duplicateStatusText.Text = "Duplicate scan cancelled.";
+            }
 
-                using (var sha256 = SHA256.Create())
+            if (!_duplicateCts.IsCancellationRequested)
+            {
+                _duplicateResults.Clear();
+                foreach (var duplicate in duplicates)
+                    _duplicateResults.Add(duplicate);
+                // Reassign the source after the background operation so the ListBox refreshes reliably.
+                _duplicateListBox.ItemsSource = null;
+                _duplicateListBox.ItemsSource = _duplicateResults;
+                _duplicateStatusText.Text = duplicates.Count > 0 ? $"Found {duplicates.Count} duplicate file(s)." : "No duplicate files found in Downloads folder.";
+            }
+
+            _duplicateProgressBar.IsVisible = false;
+            _duplicateProgressBar.IsIndeterminate = false;
+            _cancelDuplicateButton.IsVisible = false;
+            _scanDuplicatesButton.IsEnabled = true;
+            _duplicateCts = null;
+        }
+
+        private List<DuplicateItem> FindDuplicates(IEnumerable<string> roots, CancellationToken ct, IProgress<int> progress)
+        {
+            var resultList = new ConcurrentBag<DuplicateItem>();
+            try
+            {
+                var allFiles = new List<FileInfo>();
+                foreach (var root in roots)
                 {
-                    foreach (var group in files)
+                    if (ct.IsCancellationRequested) return resultList.ToList();
+                    if (!Directory.Exists(root)) continue;
+                    var stack = new Stack<string>();
+                    stack.Push(root);
+                    while (stack.Count > 0)
                     {
-                        var hashMap = new Dictionary<string, string>();
-                        foreach (var fileInfo in group)
+                        if (ct.IsCancellationRequested) return resultList.ToList();
+                        var dir = stack.Pop();
+                        try
                         {
-                            try
+                            foreach (var file in Directory.EnumerateFiles(dir))
                             {
-                                using (var stream = File.OpenRead(fileInfo.FullName))
-                                {
-                                    byte[] hash = sha256.ComputeHash(stream);
-                                    string hashStr = BitConverter.ToString(hash).Replace("-", "");
-                                    if (hashMap.ContainsKey(hashStr))
-                                    {
-                                        resultList.Add(new DuplicateItem
-                                        {
-                                            FileName = fileInfo.Name,
-                                            FilePath = fileInfo.FullName,
-                                            OriginalPath = hashMap[hashStr],
-                                            Size = fileInfo.Length
-                                        });
-                                    }
-                                    else { hashMap[hashStr] = fileInfo.FullName; }
-                                }
+                                if (ct.IsCancellationRequested) return resultList.ToList();
+                                try { allFiles.Add(new FileInfo(file)); } catch { }
                             }
-                            catch { }
                         }
+                        catch (OperationCanceledException) { throw; }
+                        catch { }
+
+                        try
+                        {
+                            foreach (var sub in Directory.EnumerateDirectories(dir))
+                            {
+                                if (ct.IsCancellationRequested) return resultList.ToList();
+                                stack.Push(sub);
+                            }
+                        }
+                        catch (OperationCanceledException) { throw; }
+                        catch { }
                     }
                 }
+
+                var fileList = new List<FileInfo>();
+                foreach (var file in allFiles)
+                {
+                    if (ct.IsCancellationRequested) return resultList.ToList();
+                    try
+                    {
+                        if (file.Exists && file.Length > 0)
+                            fileList.Add(file);
+                    }
+                    catch (UnauthorizedAccessException) { }
+                    catch (IOException) { }
+                }
+                int total = fileList.Count;
+                int processed = 0;
+
+                var groups = fileList.GroupBy(f => f.Length).Where(g => g.Count() > 1);
+                foreach (var group in groups)
+                {
+                    if (ct.IsCancellationRequested) return resultList.ToList();
+                    var hashMap = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    Parallel.ForEach(group, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, fileInfo =>
+                    {
+                        if (ct.IsCancellationRequested) return;
+                        try
+                        {
+                            using (var stream = File.OpenRead(fileInfo.FullName))
+                            using (var sha256 = SHA256.Create())
+                            {
+                                byte[] hash = sha256.ComputeHash(stream);
+                                string hashStr = BitConverter.ToString(hash).Replace("-", "");
+                                // try to add the hash -> filepath mapping atomically; if another thread already added it, record a duplicate
+                                if (!hashMap.TryAdd(hashStr, fileInfo.FullName))
+                                {
+                                    try
+                                    {
+                                        if (hashMap.TryGetValue(hashStr, out var existing))
+                                        {
+                                            var di = new DuplicateItem
+                                            {
+                                                FileName = fileInfo.Name,
+                                                FilePath = fileInfo.FullName,
+                                                OriginalPath = existing,
+                                                Size = fileInfo.Length
+                                            };
+                                            resultList.Add(di);
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+                        catch { }
+                        finally
+                        {
+                            Interlocked.Increment(ref processed);
+                            progress?.Report((int)((processed / (double)total) * 100));
+                        }
+                    });
+                }
             }
+            catch (OperationCanceledException) { throw; }
             catch { }
-            return resultList;
+
+            return resultList.ToList();
         }
 
         private void OnDeleteDuplicateClicked(object? sender, RoutedEventArgs e)
@@ -1403,8 +1467,13 @@ namespace AISmartCleanerFree
                 {
                     File.Delete(item.FilePath);
                     _duplicateStatusText.Text = $"Successfully deleted duplicate file: {item.FileName}";
-                    var currentList = (_duplicateListBox.ItemsSource as List<DuplicateItem>)?.Where(i => i.FilePath != item.FilePath).ToList();
-                    _duplicateListBox.ItemsSource = currentList;
+                    try
+                    {
+                        _duplicateResults.Remove(item);
+                        _duplicateListBox.ItemsSource = null;
+                        _duplicateListBox.ItemsSource = _duplicateResults;
+                    }
+                    catch { }
                 }
                 catch (Exception ex) { _duplicateStatusText.Text = $"Failed to delete file: {ex.Message}"; }
             }

@@ -47,7 +47,7 @@ cat > "$APPDIR/Contents/Info.plist" <<EOF
   <key>CFBundleIdentifier</key>
   <string>tech.japnam.aismartcleaner</string>
   <key>CFBundleVersion</key>
-  <string>2.5.2</string>
+	<string>2.5.3</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>LSMinimumSystemVersion</key>
