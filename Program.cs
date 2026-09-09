@@ -34,6 +34,9 @@ static class Localization
         };
     }
 
+
+
+
     private static string GetEnglish(string key) => key switch
     {
         "app_title" => "🤖 AI Smart Cleaner",
@@ -282,6 +285,11 @@ namespace AISmartCleanerFree
         private ProgressBar _progressBar;
         private Image _aiCleanerImageControl;
         private Border _aiImageBorder;
+        private ListBox _scanTargetsListBox;
+        private Button _addFolderButton;
+        private Button _refreshDrivesButton;
+        private CheckBox _includeDriversCheck;
+        private CheckBox _includeDumpsCheck;
 
         // --- DUPLICATE FINDER FIELDS ---
         private ListBox _duplicateListBox;
@@ -420,6 +428,9 @@ namespace AISmartCleanerFree
                 Child = topBarGrid
             };
 
+            // Populate initial scan targets
+            PopulateScanTargets();
+
             // --- TAB 1: AI SYSTEM CLEANER ---
             _cleanerTab = new TabItem { Header = "🤖 AI Cleaner", FontSize = 15 };
             var cleanerHeader = CreatePrimaryHeader("hdr_cleaner");
@@ -463,11 +474,44 @@ namespace AISmartCleanerFree
             };
             _cleanButton.Click += OnCleanClicked;
 
+            // Scan targets UI: list drives and allow adding custom folders
+            _scanTargetsListBox = new ListBox { Height = 120, SelectionMode = SelectionMode.Multiple };
+            _refreshDrivesButton = new Button { Content = "🔄 Refresh Drives", Padding = new Thickness(8,4), CornerRadius = new CornerRadius(6), Margin = new Thickness(0,6,6,0) };
+            _addFolderButton = new Button { Content = "➕ Add Folder...", Padding = new Thickness(8,4), CornerRadius = new CornerRadius(6), Margin = new Thickness(6,6,0,0) };
+            _includeDriversCheck = new CheckBox { Content = "🔧 Include Drivers Folders (e.g., system drivers)", IsChecked = false, Margin = new Thickness(0,8,0,0) };
+            _includeDumpsCheck = new CheckBox { Content = "💥 Include System Crash Dumps", IsChecked = false, Margin = new Thickness(0,4,0,10) };
+
+            var targetButtons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center };
+            targetButtons.Children.Add(_refreshDrivesButton);
+            targetButtons.Children.Add(_addFolderButton);
+
+            // Hook up drive refresh and folder picker
+            _refreshDrivesButton.Click += (s, e) => PopulateScanTargets();
+            _addFolderButton.Click += async (s, e) =>
+            {
+                try
+                {
+                    // Simple text prompt for folder path (cross-platform)
+                    var dlg = new SimpleInputDialog("Enter folder path to add:");
+                    var folder = await dlg.ShowDialog<string?>(this);
+                    if (!string.IsNullOrWhiteSpace(folder))
+                    {
+                        var current = (_scanTargetsListBox.ItemsSource as List<string>) ?? (_scanTargetsListBox.Items?.Cast<object>().Select(o => o?.ToString()).Where(s => !string.IsNullOrWhiteSpace(s)).ToList() ?? new List<string>());
+                        if (!current.Contains(folder))
+                        {
+                            current.Add(folder);
+                            _scanTargetsListBox.ItemsSource = current.Distinct().ToList();
+                        }
+                    }
+                }
+                catch { }
+            };
+
             _cleanerTab.Content = new StackPanel
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(40),
-                Children = { cleanerHeader, _statusText, _progressBar, _aiImageBorder, _cleanButton }
+                Children = { cleanerHeader, _statusText, _progressBar, _aiImageBorder, _scanTargetsListBox, targetButtons, _includeDriversCheck, _includeDumpsCheck, _cleanButton }
             };
 
             // --- TAB 2: DUPLICATE FINDER ---
@@ -1112,6 +1156,36 @@ namespace AISmartCleanerFree
             _sysInfoListBox.ItemsSource = infoItems;
         }
 
+        private void PopulateScanTargets()
+        {
+            try
+            {
+                var items = new List<string>();
+                // logical drives
+                try
+                {
+                    foreach (var d in Environment.GetLogicalDrives()) items.Add(d);
+                }
+                catch { }
+
+                // common user folders
+                try
+                {
+                    var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    items.Add(Path.Combine(home, "Downloads"));
+                    items.Add(Path.Combine(home, "Desktop"));
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        items.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "System32", "drivers"));
+                    }
+                }
+                catch { }
+
+                _scanTargetsListBox.ItemsSource = items.Distinct().Where(p => !string.IsNullOrWhiteSpace(p)).ToList();
+            }
+            catch { }
+        }
+
         private Bitmap GetEmbeddedAiCleanerImage()
         {
             string svgContent = @"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160' width='160' height='160'>
@@ -1167,7 +1241,12 @@ namespace AISmartCleanerFree
             }
             catch { }
 
-            var cleanupTask = Task.Run(() => PerformCleanup());
+            // Capture user-selected scan targets and options on UI thread
+            var selectedTargets = (_scanTargetsListBox.SelectedItems as System.Collections.IEnumerable)?.Cast<object>().Select(o => o?.ToString() ?? string.Empty).Where(s => !string.IsNullOrWhiteSpace(s)).ToList() ?? new List<string>();
+            bool includeDrivers = _includeDriversCheck.IsChecked == true;
+            bool includeDumps = _includeDumpsCheck.IsChecked == true;
+
+            var cleanupTask = Task.Run(() => PerformCleanup(selectedTargets, includeDrivers, includeDumps));
             var result = await cleanupTask;
 
             _statusText.Text = $"✨ AI Cleaning Complete!\n\nSpace Freed: {FormatBytes(result.FreedBytes)}\nFiles Removed: {result.DeletedCount}\nLocked Files Skipped: {result.ErrorCount}";
@@ -1176,12 +1255,55 @@ namespace AISmartCleanerFree
             _cleanButton.Content = "✨ Run AI Smart Clean Again";
         }
 
-        private CleanupResult PerformCleanup()
+        private CleanupResult PerformCleanup(IEnumerable<string>? extraTargets = null, bool includeDrivers = false, bool includeDumps = false)
         {
             long freedBytes = 0;
             int deletedCount = 0;
             int errorCount = 0;
-            var paths = GetJunkPaths();
+            var paths = GetJunkPaths().ToList();
+
+            // incorporate extra user-selected targets
+            try
+            {
+                if (extraTargets != null)
+                {
+                    foreach (var t in extraTargets.Where(s => !string.IsNullOrWhiteSpace(s))) paths.Add(t);
+                }
+            }
+            catch { }
+
+            // include drivers folder(s)
+            try
+            {
+                if (includeDrivers)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        paths.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "System32", "drivers"));
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                        paths.Add(Path.Combine("/lib", "modules"));
+                }
+            }
+            catch { }
+
+            // include dumps
+            try
+            {
+                if (includeDumps)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        var windir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                        paths.Add(Path.Combine(windir, "MEMORY.DMP"));
+                        paths.Add(Path.Combine(windir, "Minidump"));
+                    }
+                    else
+                    {
+                        paths.Add(Path.Combine("/var", "crash"));
+                    }
+                }
+            }
+            catch { }
+
             foreach (var dir in paths)
             {
                 if (Directory.Exists(dir)) CleanDirectory(dir, ref freedBytes, ref deletedCount, ref errorCount);
@@ -1514,5 +1636,27 @@ namespace AISmartCleanerFree
         public string Path { get; set; } = string.Empty;
         public bool IsEnabled { get; set; }
         public override string ToString() => $"{(IsEnabled ? "✅ Enabled" : "❌ Disabled")}   |   {Name}";
+    }
+    // Simple input dialog used to ask for a folder path (very small cross-platform UI)
+    public class SimpleInputDialog : Window
+    {
+        private TextBox _input;
+        public SimpleInputDialog(string prompt)
+        {
+            Title = prompt;
+            Width = 500;
+            Height = 140;
+            WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+            _input = new TextBox { Margin = new Thickness(10) };
+            var ok = new Button { Content = "OK", Width = 80, Margin = new Thickness(6) };
+            var cancel = new Button { Content = "Cancel", Width = 80, Margin = new Thickness(6) };
+
+            ok.Click += (_, __) => { Close(_input.Text); };
+            cancel.Click += (_, __) => { Close(null); };
+
+            var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Children = { cancel, ok } };
+            Content = new StackPanel { Children = { _input, buttons }, Margin = new Thickness(8) };
+        }
     }
 }
