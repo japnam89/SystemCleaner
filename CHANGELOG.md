@@ -6,6 +6,12 @@ Unreleased
 ---------
 ### v2.5.2 - Unreleased
 - Fix: Browser cleanup crash when run from background thread. The cleanup now captures UI state on the UI thread and performs asynchronous, limited-concurrency file deletions to avoid cross-thread access and improve robustness.
+- Enhancement: Add options and improved handling for additional cleanup targets:
+  - Empty the Recycle Bin / Trash when selected.
+  - Clear system and application temp folders (Windows %TEMP%, user temp, macOS /tmp, Linux /tmp).
+  - Remove Windows crash dump and minidump files (.dmp) to free large diagnostic files.
+  - Optionally clear the Downloads folder temporary files (user-selected) to remove stale installers and archives.
+  - Skip files that are locked/in use and continue processing remaining items.
 
 Released
 --------
