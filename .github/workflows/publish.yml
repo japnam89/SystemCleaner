@@ -1,0 +1,46 @@
+name: Build and Publish Artifacts
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet-version: ['8.0.x']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Restore
+        run: dotnet restore SystemCleaner.csproj
+      - name: Publish (Windows x64)
+        if: matrix.os == 'windows-latest'
+        run: |
+          dotnet publish SystemCleaner.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true -o artifacts/win-x64
+          powershell -Command "Compress-Archive -Path artifacts/win-x64/* -DestinationPath artifacts/SystemCleaner-win-x64.zip"
+      - name: Publish (macOS x64)
+        if: matrix.os == 'macos-latest'
+        run: |
+          dotnet publish SystemCleaner.csproj -c Release -r osx-x64 --self-contained true /p:PublishSingleFile=true -o artifacts/osx-x64
+          # create .app bundle
+          mkdir -p artifacts/osx-x64/AI_Smart_Cleaner.app/Contents/MacOS
+          mv artifacts/osx-x64/* artifacts/osx-x64/AI_Smart_Cleaner.app/Contents/MacOS/ || true
+          tar -czf artifacts/SystemCleaner-mac-osx-x64.tar.gz -C artifacts osx-x64
+      - name: Publish (linux x64)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          dotnet publish SystemCleaner.csproj -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true -o artifacts/linux-x64
+          tar -czf artifacts/SystemCleaner-linux-x64.tar.gz -C artifacts linux-x64
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SystemCleaner-artifacts-${{ matrix.os }}
+          path: artifacts
